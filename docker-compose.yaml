@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  tat-hack-nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/ssl:ro
+    depends_on:
+      - tat-hack-postgres
+      - tat-hack-front
+      - tat-hack-back
+      - chromadb
+  chromadb:
+    image: chromadb/chroma
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/latest-chroma-data:/chroma/chroma
+  tat-hack-front:
+    build:
+      context: ../tat-hack-front
+      target: production
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - tat-hack-back
+  tat-hack-back:
+    build:
+      context: .
+      dockerfile: src/tat_hack_back/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - chromadb
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/tat_hack_back/:/opt/app-root/src/tat_hack_back:rw
+    # TODO: ADD SETTINGS

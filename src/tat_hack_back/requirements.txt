@@ -1,0 +1,13 @@
+fastapi
+pydantic-settings
+gunicorn
+uvicorn
+aiohttp
+asyncpg
+openpyxl
+aioredis
+pandas
+chromadb==0.5.0
+langchain
+langchain-community
+langchain-voyageai
